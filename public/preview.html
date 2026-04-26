@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Here to Slay UI Preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/game.css">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="top-panel">
+            <div>
+                <p class="eyebrow">UI Preview</p>
+                <h1>Here to Slay</h1>
+            </div>
+
+            <div class="game-controls">
+                <button id="newGameBtn">New Game</button>
+                <button id="refreshBtn">Refresh</button>
+            </div>
+        </section>
+
+        <section class="status-bar">
+            <div>
+                <span>Current turn</span>
+                <strong id="currentPlayer">Player 1</strong>
+            </div>
+            <div>
+                <span>Action points</span>
+                <strong id="actionPoints">3</strong>
+            </div>
+            <div>
+                <span>Main deck</span>
+                <strong id="mainDeckCount">72</strong>
+            </div>
+            <div>
+                <span>Monster deck</span>
+                <strong id="monsterDeckCount">12</strong>
+            </div>
+        </section>
+
+        <section class="board-wrapper">
+            <div class="board">
+                <div class="board-glow"></div>
+
+                <section id="playerTop" class="player-zone player-zone-top"></section>
+                <section id="playerLeft" class="player-zone player-zone-left"></section>
+                <section id="playerRight" class="player-zone player-zone-right"></section>
+                <section id="playerBottom" class="player-zone player-zone-bottom"></section>
+
+                <section class="center-zone">
+                    <div class="monster-area">
+                        <h2>Active Monsters</h2>
+                        <div id="activeMonsters" class="monster-row"></div>
+                    </div>
+
+                    <div class="deck-area">
+                        <div class="deck-card main-deck">
+                            <span>Main Deck</span>
+                            <strong id="mainDeckMiniCount">72</strong>
+                        </div>
+
+                        <div class="dice-box">
+                            <div id="dieOne" class="die">?</div>
+                            <div id="dieTwo" class="die">?</div>
+                            <button id="rollBtn">Roll Dice</button>
+                        </div>
+
+                        <div class="deck-card discard-deck">
+                            <span>Discard</span>
+                            <strong id="discardCount">5</strong>
+                        </div>
+                    </div>
+
+                    <div class="action-panel">
+                        <button id="drawBtn">Draw Card - 1 AP</button>
+                        <button id="attackBtn">Attack Selected Monster - 2 AP</button>
+                        <button id="endTurnBtn">End Turn</button>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="hand-panel">
+            <div class="hand-header">
+                <div>
+                    <p class="eyebrow">Your hand</p>
+                    <h2 id="handOwner">Player 1</h2>
+                </div>
+                <p id="messageBox">This is only a UI preview. No backend is running.</p>
+            </div>
+
+            <div id="playerHand" class="hand-row"></div>
+        </section>
+    </main>
+
+    <script src="assets/js/preview.js"></script>
+</body>
+</html>
