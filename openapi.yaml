@@ -1,0 +1,492 @@
+openapi: 3.0.0
+info:
+  title: Here to Slay API
+  version: 1.1.0
+  description: API for managing Here to Slay board game sessions
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+
+  /games:
+    get:
+      summary: Get all games
+      responses:
+        '200':
+          description: List of games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+
+    post:
+      summary: Create new game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Game 1"
+      responses:
+        '201':
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+
+  /games/{gameId}:
+    get:
+      summary: Get game details
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Game details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          description: Game not found
+
+  /players:
+    get:
+      summary: Get all players
+      responses:
+        '200':
+          description: List of players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+
+  /cards:
+    get:
+      summary: Get all cards
+      responses:
+        '200':
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+
+  /monsters:
+    get:
+      summary: Get monsters
+      responses:
+        '200':
+          description: List of monsters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Monster'
+
+  /deck/draw:
+    post:
+      summary: Draw card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId, gameId]
+              properties:
+                playerId:
+                  type: string
+                gameId:
+                  type: string
+      responses:
+        '200':
+          description: Card drawn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /games/{gameId}/cards/play:
+    post:
+      summary: Play a card
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId, cardId]
+              properties:
+                playerId:
+                  type: string
+                cardId:
+                  type: string
+      responses:
+        '200':
+          description: Card played
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  card:
+                    $ref: '#/components/schemas/Card'
+
+  /games/{gameId}/heroes/{heroId}/roll:
+    post:
+      summary: Roll dice for hero ability
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: heroId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId]
+              properties:
+                playerId:
+                  type: string
+      responses:
+        '200':
+          description: Dice rolled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  roll:
+                    type: integer
+                  dice:
+                    type: array
+                    items:
+                      type: integer
+
+  /games/{gameId}/modifiers/use:
+    post:
+      summary: Use modifier card
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId, modifierId, modifierValue]
+              properties:
+                playerId:
+                  type: string
+                modifierId:
+                  type: string
+                modifierValue:
+                  type: integer
+      responses:
+        '200':
+          description: Modifier used
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /games/{gameId}/challenges:
+    post:
+      summary: Challenge a card play
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challengerId, targetPlayerId, cardId]
+              properties:
+                challengerId:
+                  type: string
+                targetPlayerId:
+                  type: string
+                cardId:
+                  type: string
+      responses:
+        '200':
+          description: Challenge result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  challengerRoll:
+                    type: integer
+                  targetRoll:
+                    type: integer
+
+  /games/{gameId}/discard-draw:
+    post:
+      summary: Discard hand and draw 5 new cards
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId]
+              properties:
+                playerId:
+                  type: string
+      responses:
+        '200':
+          description: Cards discarded and drawn
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  discarded:
+                    type: integer
+                  drawn:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Card'
+
+  /monsters/{monsterId}/attack:
+    post:
+      summary: Attack monster
+      parameters:
+        - name: monsterId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId, roll]
+              properties:
+                playerId:
+                  type: string
+                roll:
+                  type: integer
+                  example: 7
+      responses:
+        '200':
+          description: Attack result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /tutorial:
+    get:
+      summary: Get tutorial steps
+      responses:
+        '200':
+          description: List of tutorial steps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TutorialStep'
+
+  /tutorial/step/{step}:
+    get:
+      summary: Get specific tutorial step
+      parameters:
+        - name: step
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tutorial step
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorialStep'
+        '404':
+          description: Step not found
+
+components:
+  schemas:
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        partyLeader:
+          type: string
+        hand:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        party:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hero'
+        slainMonsters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Monster'
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [hero, item, magic, modifier, challenge]
+        description:
+          type: string
+
+    Hero:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        class:
+          type: string
+          enum: [fighter, guardian, ranger, thief, wizard, bard]
+        effect:
+          type: string
+        rollRequirement:
+          type: integer
+
+    Monster:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        rollRequirement:
+          type: integer
+        penalty:
+          type: string
+        reward:
+          type: string
+
+    Game:
+      type: object
+      properties:
+        id:
+          type: string
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        currentTurnPlayer:
+          $ref: '#/components/schemas/Player'
+        mainDeck:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        discardPile:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        monsterDeck:
+          type: array
+          items:
+            $ref: '#/components/schemas/Monster'
+        activeMonsters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Monster'
+
+    TutorialStep:
+      type: object
+      properties:
+        step:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        action:
+          type: string
