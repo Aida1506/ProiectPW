@@ -9,6 +9,7 @@ use App\Repository\CardRepository;
 use App\Repository\MonsterRepository;
 
 try {
+    // Test manual de persistenta: creeaza repository-urile, apoi salveaza un joc si un jucator de proba.
     $config = DatabaseConfig::getConfig();
     $db = new App\Database\Database($config);
     echo 'Database connected' . PHP_EOL;
@@ -19,6 +20,7 @@ try {
     $monsterRepo = new MonsterRepository($db);
     echo 'Repositories created' . PHP_EOL;
 
+    // Joc minimal folosit ca sa verificam ca metoda save din GameRepository functioneaza.
     $game = [
         'id' => 'test_game_' . time(),
         'name' => 'Test Game',
@@ -34,6 +36,7 @@ try {
     $gameRepo->save($game);
     echo 'Game saved' . PHP_EOL;
 
+    // Jucator minimal legat de jocul de test, folosit pentru PlayerRepository::save.
     $player = [
         'id' => 'test_player_' . time(),
         'name' => 'Test Player',

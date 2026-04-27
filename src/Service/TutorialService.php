@@ -4,6 +4,10 @@ namespace App\Service;
 
 class TutorialService
 {
+    /**
+     * Returneaza lista completa de pasi ai tutorialului.
+     * Fiecare pas are numar, titlu, descriere si un cod de actiune folosit de frontend sau API.
+     */
     public function getTutorialSteps(): array
     {
         return [
@@ -70,12 +74,20 @@ class TutorialService
         ];
     }
 
+    /**
+     * Returneaza urmatorul pas pe baza indexului zero-based primit.
+     * Ruta publica converteste numarul pasului din URL in acest index.
+     */
     public function getNextStep(int $currentStep): ?array
     {
         $steps = $this->getTutorialSteps();
         return $steps[$currentStep] ?? null;
     }
 
+    /**
+     * Cauta pasul de tutorial asociat unei actiuni.
+     * Este util cand interfata vrea sa afiseze ajutor pentru o actiune concreta.
+     */
     public function getStepByAction(string $action): ?array
     {
         foreach ($this->getTutorialSteps() as $step) {

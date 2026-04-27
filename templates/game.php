@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Template-ul principal al interfetei web. Este incarcat de ruta GET / din public/index.php. -->
     <meta charset="UTF-8">
     <title>Here to Slay Board</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="<?= htmlspecialchars($basePath ?: '') ?>/assets/css/game.css">
 </head>
 <body>
+    <!-- app-shell contine toata tabla de joc: panoul de status, zonele jucatorilor, monstrii si actiunile. -->
     <main class="app-shell">
         <section class="top-panel">
             <div>

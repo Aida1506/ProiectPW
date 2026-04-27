@@ -6,16 +6,26 @@ class GameStore
 {
     private string $file;
 
+    /**
+     * Seteaza fisierul JSON folosit pentru stocarea jocurilor.
+     * Aceasta clasa este o varianta simpla de persistenta pe fisier, pastrata ca fallback.
+     */
     public function __construct()
     {
         $this->file = __DIR__ . '/../storage/games.json';
     }
 
+    /**
+     * Returneaza toate jocurile citite din fisierul JSON.
+     */
     public function allGames(): array
     {
         return $this->read();
     }
 
+    /**
+     * Cauta un joc dupa id in lista citita din fisier.
+     */
     public function getGame(string $gameId): ?array
     {
         foreach ($this->read() as $game) {
@@ -27,6 +37,10 @@ class GameStore
         return null;
     }
 
+    /**
+     * Creeaza un joc nou in stocarea JSON.
+     * Construieste deck-urile, imparte carti si scrie noua lista de jocuri pe disc.
+     */
     public function createGame(string $name): array
     {
         $games = $this->read();
@@ -63,6 +77,10 @@ class GameStore
         return $game;
     }
 
+    /**
+     * Trage o carte din mainDeck pentru jucatorul curent.
+     * Verifica tura, action points si existenta cartilor inainte de modificare.
+     */
     public function drawCard(string $gameId, string $playerId): ?array
     {
         $games = $this->read();
@@ -110,6 +128,10 @@ class GameStore
         return null;
     }
 
+    /**
+     * Rezolva atacul unui monstru in varianta pe JSON.
+     * Daca zarul este suficient, muta monstrul la slainMonsters si reumple zona activa.
+     */
     public function attackMonster(string $monsterId, string $playerId, int $roll): array
     {
         $games = $this->read();
@@ -177,6 +199,9 @@ class GameStore
         ];
     }
 
+    /**
+     * Trece tura la urmatorul jucator si reseteaza actionPoints.
+     */
     public function endTurn(string $gameId): ?array
     {
         $games = $this->read();
@@ -210,6 +235,10 @@ class GameStore
         return null;
     }
 
+    /**
+     * Returneaza jucatorii primului joc din fisier.
+     * Metoda este folosita doar pentru varianta simplificata de stocare.
+     */
     public function allPlayers(): array
     {
         $games = $this->read();
@@ -221,16 +250,26 @@ class GameStore
         return $games[0]['players'];
     }
 
+    /**
+     * Returneaza deck-ul complet de carti construit local.
+     */
     public function allCards(): array
     {
         return $this->buildMainDeck();
     }
 
+    /**
+     * Returneaza deck-ul complet de monstri construit local.
+     */
     public function allMonsters(): array
     {
         return $this->buildMonsterDeck();
     }
 
+    /**
+     * Citeste fisierul JSON si il decodeaza intr-un array.
+     * Daca fisierul lipseste sau continutul este invalid, intoarce lista goala.
+     */
     private function read(): array
     {
         if (!file_exists($this->file)) {
@@ -243,11 +282,17 @@ class GameStore
         return is_array($data) ? $data : [];
     }
 
+    /**
+     * Scrie lista de jocuri in fisierul JSON formatat.
+     */
     private function write(array $games): void
     {
         file_put_contents($this->file, json_encode($games, JSON_PRETTY_PRINT));
     }
 
+    /**
+     * Gaseste un jucator in structura unui joc dupa id.
+     */
     private function findPlayer(array $game, string $playerId): ?array
     {
         foreach ($game['players'] as $player) {
@@ -259,6 +304,9 @@ class GameStore
         return null;
     }
 
+    /**
+     * Creeaza cei patru jucatori impliciti pentru jocurile salvate in JSON.
+     */
     private function buildPlayers(): array
     {
         return [
@@ -301,6 +349,9 @@ class GameStore
         ];
     }
 
+    /**
+     * Construieste lista de carti de baza pentru deck.
+     */
     private function buildMainDeck(): array
     {
         return [
@@ -325,6 +376,9 @@ class GameStore
         ];
     }
 
+    /**
+     * Construieste lista de monstri de baza pentru deck.
+     */
     private function buildMonsterDeck(): array
     {
         return [
@@ -337,6 +391,9 @@ class GameStore
         ];
     }
 
+    /**
+     * Helper care creeaza structura standard a unei carti.
+     */
     private function card(string $id, string $name, string $type, string $class, string $description, ?int $rollRequirement): array
     {
         return [
@@ -349,6 +406,9 @@ class GameStore
         ];
     }
 
+    /**
+     * Helper care creeaza structura standard a unui monstru.
+     */
     private function monster(string $id, string $name, int $rollRequirement, string $penalty, string $reward): array
     {
         return [

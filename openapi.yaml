@@ -5,7 +5,7 @@ info:
   description: API for managing Here to Slay board game sessions
 
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:8000
 
 paths:
 
@@ -35,6 +35,11 @@ paths:
                 name:
                   type: string
                   example: "Game 1"
+            examples:
+              newGame:
+                summary: Create a new game
+                value:
+                  name: "Friday Night Game"
       responses:
         '201':
           description: Game created
@@ -62,6 +67,106 @@ paths:
         '404':
           description: Game not found
 
+    put:
+      summary: Replace editable game fields
+      description: Updates editable game metadata such as name, current turn player, action points, and last message.
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameUpdate'
+            examples:
+              renameGame:
+                summary: Rename game and set action points
+                value:
+                  name: "Updated Game"
+                  actionPoints: 2
+                  lastMessage: "Game was updated."
+      responses:
+        '200':
+          description: Game updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          description: Game not found
+
+    patch:
+      summary: Partially update game fields
+      description: Partially updates editable game metadata such as name, current turn player, action points, and last message.
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameUpdate'
+            examples:
+              partialGameUpdate:
+                summary: Change only the game name
+                value:
+                  name: "Quick Match"
+      responses:
+        '200':
+          description: Game updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          description: Game not found
+
+    delete:
+      summary: Delete a game
+      description: Deletes the game and its players.
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Game deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Game not found
+
+  /games/{gameId}/turn/end:
+    post:
+      summary: End current turn
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Turn ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          description: Game not found
+
   /players:
     get:
       summary: Get all players
@@ -74,6 +179,67 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Player'
+
+  /players/{playerId}:
+    put:
+      summary: Replace editable player fields
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerUpdate'
+            examples:
+              updatePlayer:
+                summary: Update player profile
+                value:
+                  name: "Alex"
+                  partyLeader: "Blade Leader"
+                  partyLeaderClass: "fighter"
+      responses:
+        '200':
+          description: Player updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '404':
+          description: Player not found
+
+    patch:
+      summary: Partially update player fields
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerUpdate'
+            examples:
+              renamePlayer:
+                summary: Change only player name
+                value:
+                  name: "Maria"
+      responses:
+        '200':
+          description: Player updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '404':
+          description: Player not found
 
   /cards:
     get:
@@ -116,6 +282,12 @@ paths:
                   type: string
                 gameId:
                   type: string
+            examples:
+              drawCard:
+                summary: Draw one card
+                value:
+                  gameId: "game_123"
+                  playerId: "game_123_p1"
       responses:
         '200':
           description: Card drawn
@@ -145,6 +317,12 @@ paths:
                   type: string
                 cardId:
                   type: string
+            examples:
+              playCard:
+                summary: Play a card from hand
+                value:
+                  playerId: "game_123_p1"
+                  cardId: "c1_copy_1"
       responses:
         '200':
           description: Card played
@@ -184,6 +362,11 @@ paths:
               properties:
                 playerId:
                   type: string
+            examples:
+              rollHero:
+                summary: Roll for hero ability
+                value:
+                  playerId: "game_123_p1"
       responses:
         '200':
           description: Dice rolled
@@ -226,6 +409,13 @@ paths:
                   type: string
                 modifierValue:
                   type: integer
+            examples:
+              useModifier:
+                summary: Use a modifier card
+                value:
+                  playerId: "game_123_p1"
+                  modifierId: "c11_copy_1"
+                  modifierValue: 2
       responses:
         '200':
           description: Modifier used
@@ -262,6 +452,13 @@ paths:
                   type: string
                 cardId:
                   type: string
+            examples:
+              challengeCard:
+                summary: Challenge another player
+                value:
+                  challengerId: "game_123_p2"
+                  targetPlayerId: "game_123_p1"
+                  cardId: "c3_copy_1"
       responses:
         '200':
           description: Challenge result
@@ -298,6 +495,11 @@ paths:
               properties:
                 playerId:
                   type: string
+            examples:
+              discardAndDraw:
+                summary: Discard hand and draw five cards
+                value:
+                  playerId: "game_123_p1"
       responses:
         '200':
           description: Cards discarded and drawn
@@ -316,6 +518,64 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Card'
+
+  /games/{gameId}/players/{playerId}/hand/{cardId}:
+    delete:
+      summary: Discard a card from a player's hand
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card discarded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardActionResult'
+        '400':
+          description: Card could not be discarded
+
+  /games/{gameId}/players/{playerId}/party/{cardId}:
+    delete:
+      summary: Remove a card from a player's party
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Card removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardActionResult'
+        '400':
+          description: Card could not be removed
 
   /monsters/{monsterId}/attack:
     post:
@@ -352,37 +612,30 @@ paths:
                   message:
                     type: string
 
-  /tutorial:
-    get:
-      summary: Get tutorial steps
-      responses:
-        '200':
-          description: List of tutorial steps
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TutorialStep'
-
-  /tutorial/step/{step}:
-    get:
-      summary: Get specific tutorial step
+  /games/{gameId}/active-monsters/{monsterId}:
+    delete:
+      summary: Remove an active monster from a game
+      description: Removes an active monster and replaces it from the monster deck when possible.
       parameters:
-        - name: step
+        - name: gameId
           in: path
           required: true
           schema:
-            type: integer
+            type: string
+        - name: monsterId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Tutorial step
+          description: Monster removed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TutorialStep'
-        '404':
-          description: Step not found
+                $ref: '#/components/schemas/MonsterActionResult'
+        '400':
+          description: Monster could not be removed
 
 components:
   schemas:
@@ -408,6 +661,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Monster'
+
+    PlayerUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Player 1"
+        partyLeader:
+          type: string
+          example: "Blade Leader"
+        partyLeaderClass:
+          type: string
+          enum: [fighter, guardian, ranger, thief, wizard, bard]
 
     Card:
       type: object
@@ -478,15 +744,54 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Monster'
+        actionPoints:
+          type: integer
+          minimum: 0
+          maximum: 3
+        lastMessage:
+          type: string
 
-    TutorialStep:
+    GameUpdate:
       type: object
       properties:
-        step:
+        name:
+          type: string
+          example: "Friday Night Game"
+        currentTurnPlayerId:
+          type: string
+        actionPoints:
           type: integer
-        title:
+          minimum: 0
+          maximum: 3
+        lastMessage:
           type: string
-        description:
+
+    Message:
+      type: object
+      properties:
+        message:
           type: string
-        action:
+
+    CardActionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
           type: string
+        card:
+          $ref: '#/components/schemas/Card'
+        game:
+          $ref: '#/components/schemas/Game'
+
+    MonsterActionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        monster:
+          $ref: '#/components/schemas/Monster'
+        game:
+          $ref: '#/components/schemas/Game'

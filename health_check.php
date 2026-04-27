@@ -1,13 +1,14 @@
 <?php
 
-// Simple health check script
+// Script rapid de diagnostic pentru proiect.
+// Verifica versiunea PHP, extensiile necesare, conexiunea la baza de date si fisierele importante.
 echo "Here to Slay API Health Check\n";
 echo "==============================\n\n";
 
 // Check PHP version
 echo "PHP Version: " . PHP_VERSION . "\n";
 
-// Check required extensions
+// Lista extensiilor necesare pentru API: PDO pentru baza de date, JSON pentru raspunsuri si mbstring pentru string-uri.
 $requiredExtensions = ['pdo', 'json', 'mbstring'];
 foreach ($requiredExtensions as $ext) {
     echo "Extension {$ext}: " . (extension_loaded($ext) ? '✓' : '✗') . "\n";

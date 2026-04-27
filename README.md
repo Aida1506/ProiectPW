@@ -1,92 +1,129 @@
 # Here to Slay API
 
-A REST API for the Here to Slay board game built with Slim Framework and database abstraction.
+Aplicatie web si REST API pentru jocul de carti "Here to Slay", dezvoltata in PHP cu Slim Framework.
 
-## Features
-
-- Database abstraction with support for MySQL/SQLite
-- ACL (Access Control List) system for role-based permissions
-- Complete game logic implementation
-- Tutorial system with step-by-step guidance
-- PSR-4 compliant PHP code
-- RESTful API endpoints
-
-## Requirements
+## Cerinte
 
 - PHP 8.0+
 - Composer
-- MySQL or SQLite
+- XAMPP sau PHP instalat local
+- SQLite sau MySQL
 
-## Installation
+Proiectul este deja configurat sa foloseasca SQLite, deci MySQL din XAMPP nu este obligatoriu pentru rulare.
 
-1. Clone the repository to your XAMPP htdocs folder
-2. Run `composer install` to install dependencies
-3. Run `php setup_database.php` to initialize the database
-4. Access the API at `http://localhost/proiectpw/`
+## Instalare
 
-## Database Setup
+Din folderul proiectului:
 
-The application automatically detects and configures the database:
+```powershell
+cd C:\xampp\htdocs\proiectpw
+composer install
+php setup_database.php
+```
 
-- **MySQL**: Uses XAMPP's MySQL with default settings (localhost:3306, user: root, no password)
-- **SQLite**: Falls back to SQLite if MySQL is not available
+Daca nu ai Composer global, poti folosi fisierul inclus:
 
-Database configuration is saved in `config/database.php`.
+```powershell
+php composer.phar install
+php setup_database.php
+```
 
-## API Endpoints
+## Pornire aplicatie
 
-### Games
-- `GET /games` - List all games
-- `POST /games` - Create new game
-- `GET /games/{gameId}` - Get game details
-- `POST /games/{gameId}/turn/end` - End current turn
+Varianta recomandata:
 
-### Game Actions
-- `POST /deck/draw` - Draw a card
-- `POST /games/{gameId}/cards/play` - Play a card
-- `POST /games/{gameId}/heroes/{heroId}/roll` - Roll dice for hero
-- `POST /games/{gameId}/modifiers/use` - Use modifier card
-- `POST /games/{gameId}/challenges` - Challenge a card play
-- `POST /games/{gameId}/discard-draw` - Discard hand and draw 5 new cards
-- `POST /monsters/{monsterId}/attack` - Attack a monster
+```powershell
+cd C:\xampp\htdocs\proiectpw
+php -S localhost:8000 -t public
+```
 
-### Static Data
-- `GET /players` - Get all players
-- `GET /cards` - Get all cards
-- `GET /monsters` - Get all monsters
+Deschide in browser:
 
-### Tutorial
-- `GET /tutorial` - Get all tutorial steps
-- `GET /tutorial/step/{step}` - Get specific tutorial step
+```text
+http://localhost:8000
+```
 
-## ACL Permissions
+Daca portul 8000 este ocupat, foloseste alt port:
 
-- **Guest**: View games, players, cards, monsters
-- **Player**: Create/join games, play cards, draw cards, attack monsters
-- **Admin**: All permissions
+```powershell
+php -S localhost:8101 -t public
+```
 
-Pass role in query parameter `?role=player` or header `X-User-Role: player`.
+si deschide:
 
-## Game Rules Implementation
+```text
+http://localhost:8101
+```
 
-The API implements the complete "Here to Slay" game rules:
+## Documentatie API
 
-- Turn-based gameplay with action points
-- Card drawing and playing
-- Hero abilities with dice rolling
-- Monster attacks with success/failure
-- Modifiers and challenges
-- Party leaders and classes
-- Win conditions (3 monsters slain or 6 different classes)
+- Specificatia OpenAPI este in [openapi.yaml](openapi.yaml)
+- Documentatia proiectului este in [DOCUMENTATION.md](DOCUMENTATION.md)
 
-## Development
+## Endpoint-uri principale
 
-The project follows PSR-4 standards and uses:
-- Slim Framework for routing
-- Doctrine DBAL for database abstraction
-- Zend Permissions ACL for access control
-- JSON storage for game state
+### Jocuri
 
-## Testing
+- `GET /games` - lista jocurilor
+- `POST /games` - creeaza joc
+- `GET /games/{gameId}` - detalii joc
+- `PUT /games/{gameId}` - actualizeaza campurile jocului
+- `PATCH /games/{gameId}` - actualizeaza partial jocul
+- `DELETE /games/{gameId}` - sterge jocul
+- `POST /games/{gameId}/turn/end` - termina tura curenta
 
-Start XAMPP, ensure MySQL is running, then access the endpoints via HTTP requests or the web interface.
+### Actiuni joc
+
+- `POST /deck/draw` - trage o carte
+- `POST /games/{gameId}/cards/play` - joaca o carte
+- `POST /games/{gameId}/heroes/{heroId}/roll` - arunca zarurile pentru un erou
+- `POST /games/{gameId}/modifiers/use` - foloseste modifier
+- `POST /games/{gameId}/challenges` - foloseste challenge
+- `POST /games/{gameId}/discard-draw` - arunca mana si trage 5 carti
+- `POST /monsters/{monsterId}/attack` - ataca un monstru
+- `DELETE /games/{gameId}/players/{playerId}/hand/{cardId}` - arunca o carte din mana
+- `DELETE /games/{gameId}/players/{playerId}/party/{cardId}` - elimina o carte din party
+- `DELETE /games/{gameId}/active-monsters/{monsterId}` - elimina un monstru activ
+
+### Date statice
+
+- `GET /players`
+- `GET /cards`
+- `GET /monsters`
+- `GET /tutorial`
+- `GET /tutorial/step/{step}`
+
+## Roluri ACL
+
+Rolul se trimite prin query parameter sau header:
+
+```text
+?role=player
+X-User-Role: player
+```
+
+Roluri disponibile:
+
+- `guest` - poate vizualiza resurse
+- `player` - poate crea jocuri si face actiuni de joc
+- `admin` - are acces complet, inclusiv delete pentru jocuri
+
+## Test rapid
+
+Porneste serverul:
+
+```powershell
+php -S localhost:8000 -t public
+```
+
+Creeaza un joc:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/games?role=player" -Method Post -ContentType "application/json" -Body '{"name":"Test Game"}'
+```
+
+Lista jocurilor:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/games" -Method Get
+```

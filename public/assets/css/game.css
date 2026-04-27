@@ -1,3 +1,8 @@
+/*
+ * Stilurile principale pentru tabla Here to Slay.
+ * Fisierul controleaza layout-ul responsive, cartile, monstrii, butoanele si zonele jucatorilor.
+ */
+
 * {
     box-sizing: border-box;
 }
